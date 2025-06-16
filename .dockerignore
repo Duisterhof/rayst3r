@@ -1,0 +1,16 @@
+Dockerfile
+.dockerignore
+docker-compose.yml
+*.pyc
+__pycache__/
+.git
+.vscode/
+assets/
+datasets/
+input/
+xps/
+.gitignore
+app.py
+main.py
+readme.md
+requirements.txt

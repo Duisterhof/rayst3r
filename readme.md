@@ -25,14 +25,53 @@
 
 - [x] Inference code
 - [x] Local gradio demo
+- [x] Docker
 - [ ] Huggingface demo
-- [ ] Docker
 - [ ] Training code
 - [ ] Eval code
 - [ ] ViT-S, No-DINO and Pointmap models
 - [ ] Dataset release 
 
 # ⚙️ Installation
+
+### 🐳 Option 1: Use Prebuilt Docker Image (No Build Required)
+Note: Currently supported only for T4 GPUs
+
+1. In the .env file, make the following changes:
+```bash
+IMAGE_NAME=karthikpullalarevu/rayst3r
+TAG=rayst3r_7.5_t4
+CUDA_VISIBLE_DEVICES=0 #select according to your configuration
+```
+
+2. Run the container (Runs on Port 6000)
+```bash
+cd rayst3r
+docker-compose --env-file .env up -d
+docker-compose logs -f --tail 200
+```
+This pulls and runs the built image directly.
+
+### 🛠️🐳 Option 2: Build Docker image locally
+1. Refer to the [CUDA GPU compatibility list](https://developer.nvidia.com/cuda-gpus) for compute capability. (e.g., T4 → 7.5, A100 → 8.0, 4090 → 8.9).
+2. In the `.env` file, set the compute capability for your GPU:
+```bash
+CUDA_ARCH=<compute_capability>
+TAG=1.0.0
+CUDA_VISIBLE_DEVICES=0 #select according to your configuration
+```
+3. Build the image:
+```bash
+cd rayst3r
+docker-compose --env-file .env build
+```
+4. Run the container: (Runs on Port 6000)
+```bash
+docker-compose --env-file .env up -d
+docker-compose logs -f --tail 200
+```
+
+### 🛠️ Option 3: Build from Source
 
 ```bash
 mamba create -n rayst3r python=3.11 cmake=3.14.0
@@ -62,21 +101,44 @@ The expected input for RaySt3R is a folder with the following structure:
 Note the depth image needs to be saved in uint16, normalized to a 0-10 meters range. We provide an example directory in `example_scene`.
 Run RaySt3R with:
 
+✅ Option 1: Run with Docker API 
 
+1. Ensure Docker is running on port 6000.
+2. Your input directory (example_scene/) should be at the same level as the repo and mounted into the container.
+
+🔁 Reconstruct using curl
+
+```bash
+curl -X POST http://localhost:6000/reconstruct -F data_dir=example_scene/
+```
+Optional flags:
+```bash
+💡 To pass additional arguments, use the -F flag like this:
+    
+    -F argument_name=value  
+
+    For example:
+    -F n_pred_views=5 -F visualize=true
+```
+
+Note: During the first run, the models are downloaded. This might take additional time.
+
+✅ Option 2: Run locally
 ```bash
 python3 eval_wrapper/eval.py example_scene/
 ```
-This writes a colored point cloud back into the input directory.
-
-Optional flags:
+Optional flags (same flags can be used for docker method):
 ```bash
+--n_pred_views # Number of predicted views along each axis in a grid, 5--> 22 views total
 --visualize # Spins up a rerun client to visualize predictions and camera posees
 --run_octmae # Novel views sampled with the OctMAE parameters (see paper)
 --set_conf N # Sets confidence threshold to N 
---n_pred_views # Number of predicted views along each axis in a grid, 5--> 22 views total
 --filter_all_masks # Use all masks, point gets rejected if in background for a single mask
 --tsdf # Fits TSDF to depth maps
 ```
+
+#### Once executed successfully, a colored point cloud back is saved in the input directory.
+
 
 # 🧪 Gradio app
 
