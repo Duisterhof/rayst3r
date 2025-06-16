@@ -8,12 +8,16 @@ try:
 except ModuleNotFoundError:
     from . import curope as _kernels # run `python setup.py build_ext --inplace`
 
-from torch.amp import custom_fwd, custom_bwd
+try:
+    from torch.amp import custom_fwd, custom_bwd
+except ImportError:
+    # For older versions of PyTorch
+    from torch.cuda.amp import custom_fwd, custom_bwd
 
 class cuRoPE2D_func (torch.autograd.Function):
 
     @staticmethod
-    @custom_fwd(device_type='cuda', cast_inputs=torch.float32)
+    @custom_fwd(cast_inputs=torch.float32)
     def forward(ctx, tokens, positions, base, F0=1):
         ctx.save_for_backward(positions)
         ctx.saved_base = base
@@ -24,7 +28,7 @@ class cuRoPE2D_func (torch.autograd.Function):
         return tokens
 
     @staticmethod
-    @custom_bwd(device_type='cuda')
+    @custom_bwd
     def backward(ctx, grad_res):
         positions, base, F0 = ctx.saved_tensors[0], ctx.saved_base, ctx.saved_F0
         _kernels.rope_2d( grad_res, positions, base, -F0 )

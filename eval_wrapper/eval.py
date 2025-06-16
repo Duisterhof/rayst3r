@@ -391,35 +391,35 @@ def eval_scene(model, data_dir,visualize=False,rr_addr=None,run_octmae=False,set
     return all_points
 
 
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("data_dir", type=str)
-    parser.add_argument("--rr_addr", type=str, default="0.0.0.0:"+os.getenv("RERUN_RECORDING","9876"))
-    parser.add_argument("--visualize", action="store_true", default=False)
-    parser.add_argument("--run_octmae", action="store_true", default=False)
-    parser.add_argument("--set_conf", type=float, default=5)
-    parser.add_argument("--n_pred_views", type=int, default=5)
-    parser.add_argument("--filter_all_masks", action="store_true", default=False)
-    parser.add_argument("--tsdf", action="store_true", default=False)
-    # ablation settings
-    parser.add_argument("--no_input_mask", action="store_true", default=False)
-    parser.add_argument("--no_pred_mask", action="store_true", default=False)
-    parser.add_argument("--no_filter_input_view", action="store_true", default=False)
-    parser.add_argument("--false_positive", type=float, default=None)
-    parser.add_argument("--false_negative", type=float, default=None)
-    args = parser.parse_args()
+# def main():
+#     parser = argparse.ArgumentParser()
+#     parser.add_argument("data_dir", type=str)
+#     parser.add_argument("--rr_addr", type=str, default="0.0.0.0:"+os.getenv("RERUN_RECORDING","9876"))
+#     parser.add_argument("--visualize", action="store_true", default=False)
+#     parser.add_argument("--run_octmae", action="store_true", default=False)
+#     parser.add_argument("--set_conf", type=float, default=5)
+#     parser.add_argument("--n_pred_views", type=int, default=5)
+#     parser.add_argument("--filter_all_masks", action="store_true", default=False)
+#     parser.add_argument("--tsdf", action="store_true", default=False)
+#     # ablation settings
+#     parser.add_argument("--no_input_mask", action="store_true", default=False)
+#     parser.add_argument("--no_pred_mask", action="store_true", default=False)
+#     parser.add_argument("--no_filter_input_view", action="store_true", default=False)
+#     parser.add_argument("--false_positive", type=float, default=None)
+#     parser.add_argument("--false_negative", type=float, default=None)
+#     args = parser.parse_args()
     
-    print("Loading checkpoint from Huggingface")
-    rayst3r_checkpoint = hf_hub_download("bartduis/rayst3r", "rayst3r.pth")
+#     print("Loading checkpoint from Huggingface")
+#     rayst3r_checkpoint = hf_hub_download("bartduis/rayst3r", "rayst3r.pth")
     
-    model = EvalWrapper(rayst3r_checkpoint,distributed=False)
-    all_points = eval_scene(model, args.data_dir,visualize=args.visualize,rr_addr=args.rr_addr,run_octmae=args.run_octmae,set_conf=args.set_conf,
-                            no_input_mask=args.no_input_mask,no_pred_mask=args.no_pred_mask,no_filter_input_view=args.no_filter_input_view,false_positive=args.false_positive,
-                            false_negative=args.false_negative,n_pred_views=args.n_pred_views,
-                            do_filter_all_masks=args.filter_all_masks,tsdf=args.tsdf).cpu().numpy()
-    all_points_save = os.path.join(args.data_dir,"inference_points.ply")
-    o3d_pc = npy2ply(all_points,colors=None,normals=None)
-    o3d.io.write_point_cloud(all_points_save, o3d_pc)
+#     model = EvalWrapper(rayst3r_checkpoint,distributed=False)
+#     all_points = eval_scene(model, args.data_dir,visualize=args.visualize,rr_addr=args.rr_addr,run_octmae=args.run_octmae,set_conf=args.set_conf,
+#                             no_input_mask=args.no_input_mask,no_pred_mask=args.no_pred_mask,no_filter_input_view=args.no_filter_input_view,false_positive=args.false_positive,
+#                             false_negative=args.false_negative,n_pred_views=args.n_pred_views,
+#                             do_filter_all_masks=args.filter_all_masks,tsdf=args.tsdf).cpu().numpy()
+#     all_points_save = os.path.join(args.data_dir,"inference_points.ply")
+#     o3d_pc = npy2ply(all_points,colors=None,normals=None)
+#     o3d.io.write_point_cloud(all_points_save, o3d_pc)
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()
