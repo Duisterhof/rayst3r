@@ -26,7 +26,7 @@
 - [x] Inference code
 - [x] Local gradio demo
 - [ ] Huggingface demo
-- [ ] Docker
+- [x] Docker
 - [ ] Training code
 - [ ] Eval code
 - [ ] ViT-S, No-DINO and Pointmap models
@@ -86,6 +86,47 @@ Launch it with:
 ```bash
 python app.py
 ```
+
+# 🐳 Docker Usage
+
+Build the Docker image:
+```bash
+docker build -t rayst3r:latest .
+```
+
+Run the container with the example scene mounted:
+```bash
+docker run --rm --gpus all -v $(pwd)/example_scene:/data -it rayst3r:latest
+```
+
+This will:
+- Build the container with all dependencies and pre-download the required models
+- Mount your local `example_scene` directory to `/data` inside the container
+- Launch an interactive shell in the container
+
+Once inside the container, you can:
+
+**Run RaySt3R evaluation:**
+```bash
+python3 eval_wrapper/eval.py /data
+```
+
+**Launch the Gradio demo with public sharing:**
+```bash
+python3 app.py --share
+```
+This will produce a gradio link for the demo that you can share with other
+users. Note that the demo is on the internet in this case, it is generally
+not a good idea to leave it up for long.
+
+**Launch the Gradio demo without sharing:**
+```bash
+# Exit the container and run with port mapping:
+docker run --rm --gpus all -v $(pwd)/example_scene:/data -p 7860:7860 -it rayst3r:latest
+# Then inside the container:
+python3 app.py
+```
+
 
 # 🎛️ Parameter Guide
 

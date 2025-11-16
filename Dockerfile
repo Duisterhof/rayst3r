@@ -30,14 +30,16 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
   ninja-build \
   build-essential \
   libomp-dev \
-  && rm -rf /var/lib/apt/lists/* \
-  && pip3 install -r requirements.txt \
-  && pip install --no-build-isolation "git+https://github.com/facebookresearch/xformers.git@main#egg=xformers"
+  && rm -rf /var/lib/apt/lists/*
 
-# Build the deps
 RUN git apply torch2.9.0.patch \
-    && cd extensions/curope/ \
-    && python setup.py build_ext --inplace 
+  && pip3 install -r requirements.txt \
+  && pip3 install xformers --index-url https://download.pytorch.org/whl/cu130 \
+  && cd extensions/curope/ \
+  && python setup.py build_ext --inplace
+
+# Pre-download Hugging Face models used in eval_wrapper/eval.py and app.py
+RUN python3 -c "import torch; from huggingface_hub import hf_hub_download; torch.hub.load('facebookresearch/dinov2', 'dinov2_vitl14_reg'); hf_hub_download('bartduis/rayst3r', 'rayst3r.pth'); hf_hub_download('Ruicheng/moge-vitl', 'model.pt')" 
 
 CMD ["/bin/bash"]
 
