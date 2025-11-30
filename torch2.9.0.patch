@@ -1,0 +1,51 @@
+diff --git a/eval_wrapper/eval.py b/eval_wrapper/eval.py
+index fba7d20..7bcbc5a 100644
+--- a/eval_wrapper/eval.py
++++ b/eval_wrapper/eval.py
+@@ -23,6 +23,9 @@ from utils.geometry import compute_pointmap_torch
+ from eval_wrapper.eval_utils import npy2ply, filter_all_masks
+ from huggingface_hub import hf_hub_download
+ 
++# Allowlist entry to be able to successfully deserialize.
++torch.serialization.add_safe_globals([argparse.Namespace])
++
+ class EvalWrapper(torch.nn.Module):
+     def __init__(self,checkpoint_path,distributed=False,device="cuda",dtype=torch.float32,**kwargs):
+         super().__init__()
+@@ -422,4 +425,4 @@ def main():
+     o3d.io.write_point_cloud(all_points_save, o3d_pc)
+ 
+ if __name__ == "__main__":
+-    main()
+\ No newline at end of file
++    main()
+diff --git a/extensions/curope/kernels.cu b/extensions/curope/kernels.cu
+index 7156cd1..bf777c2 100644
+--- a/extensions/curope/kernels.cu
++++ b/extensions/curope/kernels.cu
+@@ -98,7 +98,7 @@ void rope_2d_cuda( torch::Tensor tokens, const torch::Tensor pos, const float ba
+     const int N_BLOCKS = B * N; // each block takes care of H*D values
+     const int SHARED_MEM = sizeof(float) * (D + D/4);
+ 
+-    AT_DISPATCH_FLOATING_TYPES_AND_HALF(tokens.type(), "rope_2d_cuda", ([&] {
++    AT_DISPATCH_FLOATING_TYPES_AND_HALF(tokens.scalar_type(), "rope_2d_cuda", ([&] {
+         rope_2d_cuda_kernel<scalar_t> <<<N_BLOCKS, THREADS_PER_BLOCK, SHARED_MEM>>> (
+             //tokens.data_ptr<scalar_t>(), 
+             tokens.packed_accessor32<scalar_t,4,torch::RestrictPtrTraits>(),
+diff --git a/requirements.txt b/requirements.txt
+index 30c5914..ad777e5 100644
+--- a/requirements.txt
++++ b/requirements.txt
+@@ -10,9 +11,10 @@ trimesh
+ huggingface-hub
+ wandb 
+ einops
++pycuda==2025.1.2
+ 
+ # for app.py
+ onnxruntime
+ gradio
+ rembg
+-git+https://github.com/microsoft/MoGe.git
+\ No newline at end of file
++git+https://github.com/microsoft/MoGe.git

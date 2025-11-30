@@ -1,3 +1,4 @@
+import argparse
 import numpy as np
 import gradio as gr
 import torch
@@ -196,4 +197,14 @@ demo = gr.Interface(
 )
 
 if __name__ == "__main__":
-    demo.launch()
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        description="Gradio demo for RaySt3R"
+    )
+    parser.add_argument(
+        "--share",
+        action="store_true",
+        help="Whether to share this demo through Gradio."
+    )
+    args = parser.parse_args()
+    demo.launch(share=args.share)
