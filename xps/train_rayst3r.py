@@ -15,9 +15,9 @@ imshape_output = (480,640)
 render_size = (480,640)
 
 preload_train = False
-data_dirs = ["/home/jovyan/shared/bduister/data/processed/","/home/jovyan/shared/bduister/data-2/processed/"]
+data_dirs = ["/YOUR/PATH/TO/rayst3r/dataset"]
 dino_features = [4,11,17,23]
-datasets = ['fp_gso','octmae']
+datasets = ['gso','octmae']
 prefetch_dino = False
 normalize_mode = 'median'
 #start_from = "checkpoints/gso_conf.pth"

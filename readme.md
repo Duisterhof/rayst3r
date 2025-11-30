@@ -1,7 +1,11 @@
 # RaySt3R: Predicting Novel Depth Maps for Zero-Shot Object Completion
+### <center>NeurIPS 2025</center>
 <div align="center", documentation will follow later.
 <a href="https://arxiv.org/abs/2506.05285"><img src='https://img.shields.io/badge/arXiv-Paper-red?logo=arxiv&logoColor=white' alt='arXiv'></a>
 <a href='https://rayst3r.github.io'><img src='https://img.shields.io/badge/Project_Page-Website-green?logo=googlechrome&logoColor=white' alt='Project Page'></a>
+<a href="https://huggingface.co/spaces/bartduis/rayst3r"><img src='https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Demo-blue'></a>
+<a href="https://huggingface.co/datasets/bartduis/rayst3r"><img src='https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Dataset-blue'></a>
+
 
 </div>
 
@@ -25,12 +29,13 @@
 
 - [x] Inference code
 - [x] Local gradio demo
-- [ ] Huggingface demo
+- [x] Huggingface demo
 - [x] Docker
-- [ ] Training code
+- [x] Training code
+- [x] Dataset release 
 - [ ] Eval code
 - [ ] ViT-S, No-DINO and Pointmap models
-- [ ] Dataset release 
+
 
 # ⚙️ Installation
 
@@ -39,11 +44,6 @@ mamba create -n rayst3r python=3.11 cmake=3.14.0
 mamba activate rayst3r
 mamba install pytorch torchvision pytorch-cuda=12.4 -c pytorch -c nvidia # change to your version of cuda
 pip install -r requirements.txt
-
-# compile the cuda kernels for RoPE
-cd extensions/curope/
-python setup.py build_ext --inplace 
-cd ../../
 ```
 
 # 🚀 Usage
@@ -126,6 +126,16 @@ docker run --rm --gpus all -v $(pwd)/example_scene:/data -p 7860:7860 -it rayst3
 # Then inside the container:
 python3 app.py
 ```
+
+# Training RaySt3R
+Download and unzip the [RaySt3R dataset on Huggingface](https://huggingface.co/datasets/bartduis/rayst3r). Next, in [xps/train_rayst3r.py](xps/train_rayst3r.py), replace <pre style="font-size: 0.75em;">
+data_dirs = ["/YOUR/PATH/TO/rayst3r/dataset"]
+</pre>
+with one or more paths where the Octmae and GSO datasets are located. Now by running:
+<pre style="font-size: 0.75em;">
+python3 xps/train_rayst3r.py
+</pre>
+you will print the command to start training RaySt3R!
 
 
 # 🎛️ Parameter Guide

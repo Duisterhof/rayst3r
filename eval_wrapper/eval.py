@@ -26,7 +26,7 @@ from huggingface_hub import hf_hub_download
 class EvalWrapper(torch.nn.Module):
     def __init__(self,checkpoint_path,distributed=False,device="cuda",dtype=torch.float32,**kwargs):
         super().__init__()
-        checkpoint = torch.load(checkpoint_path, map_location='cpu')
+        checkpoint = torch.load(checkpoint_path, map_location='cpu',weights_only=False)
         model_string = checkpoint['args'].model
         
         self.model = eval(model_string).to(device)
